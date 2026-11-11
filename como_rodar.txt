@@ -1,0 +1,84 @@
+BIO-AGRO - COMO LIGAR O SERVIDOR
+
+1) ABRIR O BACKEND
+
+Terminal 1:
+cd e:\bio-agro-v0.3\backend
+.\.venv\Scripts\Activate.ps1
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+Se o ambiente .venv ainda não existir:
+cd e:\bio-agro-v0.3\backend
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip setuptools wheel
+python -m pip install -r requirements.txt
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+2) ABRIR O FRONTEND
+
+Terminal 2:
+cd e:\bio-agro-v0.3\frontend
+npm install
+npm run dev
+
+3) VERIFICAR O BANCO POSTGRESQL
+
+Se o PostgreSQL estiver parado:
+Get-Service -Name postgresql*
+Start-Service -Name postgresql-x64-17
+
+Para verificar se o banco existe:
+$psql = Get-ChildItem "C:\Program Files\PostgreSQL" -Recurse -Filter psql.exe | Select-Object -First 1 -ExpandProperty FullName
+& $psql -U postgres
+
+No console do PostgreSQL, rode:
+CREATE USER bio_agro_user WITH PASSWORD 'change_this_local_password';
+CREATE DATABASE bio_agro OWNER bio_agro_user;
+GRANT ALL PRIVILEGES ON DATABASE bio_agro TO bio_agro_user;
+\c bio_agro
+GRANT ALL ON SCHEMA public TO bio_agro_user;
+\q
+
+4) ACESSOS
+
+Frontend: http://localhost:5173
+Backend Swagger: http://localhost:8000/docs
+Health check: http://localhost:8000/api/health
+
+5) LOGIN PADRÃO DO ADMIN
+
+Email: admin@bioagro.co.mz
+Senha: Admin@12345
+
+6) IMPORTANTE
+
+- Use Python 3.12 para o backend.
+- O PostgreSQL precisa estar rodando.
+- O backend deve subir antes do frontend.
+- Se o backend falhar no banco, crie o usuário e o banco novamente.
+
+7) SE QUISER RESTARTAR LIMPO
+
+Backend:
+cd e:\bio-agro-v0.3\backend
+.\.venv\Scripts\Activate.ps1
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+Frontend:
+cd e:\bio-agro-v0.3\frontend
+npm run dev
+
+8) COMANDOS RAPIDOS
+
+Backend:
+cd e:\bio-agro-v0.3\backend
+.\.venv\Scripts\Activate.ps1
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+Frontend:
+cd e:\bio-agro-v0.3\frontend
+npm run dev
+
+Fim.
+B: te orientar para criar o deploy agora, clicando em cada página

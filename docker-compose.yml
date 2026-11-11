@@ -1,0 +1,48 @@
+# Só a base de dados:   docker compose up -d db
+# Aplicação completa:   docker compose up -d --build   →  http://localhost:8080
+services:
+  db:
+    image: postgres:16
+    container_name: bio-agro-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: bio_agro
+      POSTGRES_USER: bio_agro_user
+      POSTGRES_PASSWORD: change_this_local_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - bio_agro_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bio_agro_user -d bio_agro"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: bio-agro-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://bio_agro_user:change_this_local_password@db:5432/bio_agro
+      SECRET_KEY: ${SECRET_KEY:-troque-esta-chave-em-producao}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@bioagro.co.mz}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Admin@12345}
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:8080}
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: ./frontend
+    container_name: bio-agro-web
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+
+volumes:
+  bio_agro_pgdata:
